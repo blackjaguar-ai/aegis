@@ -1,0 +1,40 @@
+# AEGIS - paleta para Alacritty
+[window]
+opacity = 0.9
+padding = { x = 12, y = 10 }
+
+[font]
+normal = { family = "Share Tech Mono" }
+size = 12
+
+[colors.primary]
+background = "#03090f"
+foreground = "#dff8ff"
+
+[colors.cursor]
+text = "#03090f"
+cursor = "#3fe0ff"
+
+[colors.selection]
+text = "#ffffff"
+background = "#0096b9"
+
+[colors.normal]
+black = "#0a1a26"
+red = "#ff4d5e"
+green = "#4dffa6"
+yellow = "#ffb347"
+blue = "#00b4d8"
+magenta = "#a08cff"
+cyan = "#3fe0ff"
+white = "#dff8ff"
+
+[colors.bright]
+black = "#3a6070"
+red = "#ff7884"
+green = "#8cffc8"
+yellow = "#ffd166"
+blue = "#3fe0ff"
+magenta = "#c4b6ff"
+cyan = "#96f0ff"
+white = "#ffffff"

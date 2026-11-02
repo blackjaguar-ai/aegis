@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Id": "com.escaitech.aegis.hud",
+        "Name": "AEGIS HUD",
+        "Description": "Centro de mando con telemetría en vivo: reloj, sistemas, enlace, procesos, perímetro y operaciones",
+        "Category": "System Information",
+        "Authors": [{ "Name": "Escai Tech" }],
+        "License": "GPL-3.0+",
+        "Version": "1.0",
+        "EnabledByDefault": true,
+        "Icon": "utilities-system-monitor"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-MainScript": "ui/main.qml"
+}

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Instalar AEGIS
+Comment=Instala el tema AEGIS para KDE Plasma 6
+Icon=preferences-desktop-theme
+Exec=sh -c "cd \\"\\${1%%/*}\\" && exec ./instalar.sh --grafico" _ %k
+Terminal=false
+Categories=Settings;

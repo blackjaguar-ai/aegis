@@ -1,0 +1,14 @@
+{
+    "KPackageStructure": "Plasma/Wallpaper",
+    "KPlugin": {
+        "Id": "com.escaitech.aegis.wallpaper",
+        "Name": "AEGIS Centro de Mando",
+        "Description": "Fondo holográfico animado: núcleo de anillos, radar, registro de eventos y retícula hexagonal",
+        "Authors": [{ "Name": "Escai Tech" }],
+        "Category": "",
+        "Icon": "preferences-desktop-wallpaper",
+        "License": "GPL-3.0+",
+        "Version": "1.0"
+    },
+    "X-KDE-ParentApp": "org.kde.plasmashell"
+}
