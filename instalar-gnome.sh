@@ -10,7 +10,7 @@ PY=/usr/bin/python3   # el python del sistema, no el de conda
 [ "${XDG_SESSION_TYPE:-}" = x11 ] || { echo "AEGIS necesita una sesion X11 (elige 'Ubuntu en Xorg' al iniciar sesion)."; exit 1; }
 falta=()
 $PY -c 'import venv, ensurepip' 2>/dev/null || falta+=(python3-venv)
-ldconfig -p | grep -q libxcb-cursor.so.0 || falta+=(libxcb-cursor0)
+{ ldconfig -p 2>/dev/null | grep libxcb-cursor.so.0 >/dev/null || ls /usr/lib/*/libxcb-cursor.so.0 >/dev/null 2>&1; } || falta+=(libxcb-cursor0)
 command -v xprop >/dev/null || falta+=(x11-utils)
 if [ ${#falta[@]} -gt 0 ]; then echo "Falta: ${falta[*]}"; echo "Instala con:  sudo apt install ${falta[*]}"; echo "y vuelve a ejecutar ./instalar-gnome.sh"; exit 1; fi
 
