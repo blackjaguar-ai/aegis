@@ -37,7 +37,20 @@ tar xzf aegis-1.0.tar.gz && cd aegis-1.0
 
 Necesita KDE Plasma 6, `python3`, `qdbus6` y `kwriteconfig6`. Solo toca tu usuario y, antes de cambiar nada, guarda una copia de tus ajustes en `~/.local/share/aegis/backup/original/`.
 
-## Uso
+## Instalar en GNOME (Ubuntu 22.04 o más reciente, sesión X11)
+
+Sin Plasma, AEGIS funciona como capa de escritorio con el mismo fondo y el mismo HUD (`gnome/`). Va detrás de tus ventanas y no aparece en la barra de tareas ni en Alt+Tab.
+
+```bash
+git clone https://github.com/blackjaguar-ai/aegis && cd aegis
+./instalar-gnome.sh                # o --acento=1 / 2 / 3
+```
+
+Si te pide dependencias, instálalas con `sudo apt install python3-venv libxcb-cursor0 x11-utils`. Usa su propio entorno de Python con PySide6, así que no interfiere con conda. Arranca solo al iniciar sesión.
+
+**Quitarlo:** `~/.local/share/aegis/desinstalar-gnome.sh` lo apaga y quita el arranque automático. Con `--todo` lo borra por completo.
+
+## Uso (Plasma)
 
 ```bash
 ~/.local/share/aegis/aplicar.sh acento 2     # cambia el acento del fondo, el HUD y el bloqueo
