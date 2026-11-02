@@ -55,7 +55,10 @@ PlasmoidItem {
             cpuH: root.cpuH; rxH: root.rxH; txH: root.txH
             ahora: root.ahora
             acento: root.pal[0]; acento2: root.pal[1]
-            onAccion: function (id) { sh.connectSource("sh '" + root.codigo + "accion.sh' " + id + " #" + Date.now()) }
+            onAccion: function (id, arg) {
+                var a = String(arg || "").replace(/'/g, "'\\''")   // comillas simples escapadas para el shell
+                sh.connectSource("sh '" + root.codigo + "accion.sh' " + id + " '" + a + "' #" + Date.now())
+            }
         }
     }
 }

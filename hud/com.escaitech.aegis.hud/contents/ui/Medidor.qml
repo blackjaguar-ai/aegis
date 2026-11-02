@@ -11,10 +11,11 @@ Item {
     property string texto: ""
     property string unidad: ""
     property color color: "#3fe0ff"
+    property bool animado: true
     width: 96; height: 100
     readonly property real f: Math.max(0, Math.min(1, valor / maximo))
     property real fa: f
-    Behavior on fa { NumberAnimation { duration: 700; easing.type: Easing.OutCubic } }
+    Behavior on fa { enabled: g.animado; NumberAnimation { duration: 700; easing.type: Easing.OutCubic } }
 
     Shape {
         width: 96; height: 96

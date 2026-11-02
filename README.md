@@ -1,6 +1,6 @@
 # AEGIS
 
-> Tema de escritorio para **KDE Plasma 6** con estética de centro de mando holográfico: núcleo de anillos animado, radar, registro de eventos y un HUD con telemetría real de tu equipo.
+> Tema de escritorio con estética de centro de mando holográfico para **GNOME** (X11) y **KDE Plasma 6**. Tiene un núcleo animado que reacciona a tu CPU, un radar con tus conexiones de red reales, un registro de eventos del sistema y un HUD con telemetría, Docker, proyectos git, clima y accesos directos. Ahorra batería: se congela cuando una ventana tapa el escritorio.
 
 ![AEGIS en cian](capturas/escritorio-cian.png)
 
@@ -10,65 +10,102 @@
 |---|---|
 | ![Ámbar](capturas/escritorio-ambar.png) | ![Carmesí](capturas/escritorio-carmesi.png) |
 
-## Qué incluye
+## Todo con datos reales
 
-| Pieza | Qué es |
+| Elemento | Qué muestra |
 |---|---|
-| Fondo animado | Plugin de Plasma vectorial (QML). Tiene un núcleo de 12 anillos que giran a distinta velocidad, un radar con barrido y ecos, un registro de eventos en vivo, un espectro, una retícula hexagonal con celdas que laten, partículas y una línea de escaneo. Se escala a cualquier resolución sin perder nitidez y también se usa en la pantalla de bloqueo. |
-| HUD | Widget con reloj, **sistemas** (CPU, RAM y temperatura en medidores, gráfica de CPU, carga, disco y batería), **enlace** (IP, gateway, SSID, VPN y tráfico ↓↑ con gráfica), **procesos** (los que más CPU usan), **perímetro** (puertos en escucha; los expuestos a la red salen en ámbar, y avisa de servicios caídos) y **operaciones** (terminal, monitor, red y archivos). |
-| Barra | Panel superior: inicio, apps, reloj centrado y bandeja reducida. |
-| Colores | Esquema `AEGIS` para todas las ventanas y para Plasma (Breeze lo sigue). |
-| Terminal | Perfil y paleta para Konsole, y paleta para Alacritty si la tienes. |
-| Tipografía | Orbitron (titulares), Rajdhani (interfaz) y Share Tech Mono (datos y terminal). Todas con licencia OFL. |
+| **Núcleo** | Gira más rápido y brilla más según el uso de CPU. El anillo segmentado se llena con la carga y pasa a ámbar por encima del 85 %. |
+| **Núcleos** | Una barra por cada núcleo de tu CPU, con su uso en vivo. |
+| **Radar** | Un eco por cada conexión de red activa. Las conexiones a internet salen en ámbar y las de tu red local en cian. |
+| **Registro de eventos** | Eventos reales: cargador conectado o desconectado, batería baja, cambio de Wi-Fi o VPN, USB conectado o retirado, temperatura o carga alta, contenedores Docker iniciados o detenidos, y puertos nuevos expuestos a la red. Entre evento y evento, muestra una línea de telemetría. |
+| **Etiquetas** | Batería, red actual, carga del sistema y hora local. |
 
-El motor de datos (`hud/.../code/datos.py`) **solo lee** `/proc`, `/sys`, `ip`, `ss` y `ps`. No usa la red ni `sudo`.
+## HUD
 
-## Instalar
+| Tarjeta | Contenido |
+|---|---|
+| Cabecera | Reloj, fecha, clima (Open-Meteo), tiempo encendido, equipo, kernel, sistema y perfil de energía. |
+| Sistemas | Medidores de CPU, RAM, temperatura y **GPU** (uso, temperatura y VRAM), con la gráfica de CPU, la carga, el disco y la batería (porcentaje, vatios y tiempo restante). |
+| Enlace | IP, gateway, SSID, VPN, tráfico ↓↑ con gráfica y conexiones externas. |
+| Módulos | Cuatro pestañas que rotan solas. Si pulsas una, se queda fija un minuto. **Procesos**: los que más CPU usan. **Docker**: tus contenedores, con botones ▶/■. **Proyectos**: tus repositorios git con la rama y los cambios pendientes; un clic lo abre en VS Code. **Perímetro**: puertos en escucha, con los expuestos en ámbar, y servicios caídos. |
+| Accesos | Ocho botones configurables. |
 
-**Con doble clic:** descomprime el paquete y abre **«Instalar AEGIS»**.
+![Módulos](capturas/modulos.png)
 
-**Desde la terminal:**
+## Batería
+
+| Modo | Cuándo | Qué hace |
+|---|---|---|
+| **completo** | Con el cargador conectado y el escritorio visible | Animación fluida con partículas y destellos. |
+| **eco** | Con batería | Dibuja 12 cuadros por segundo, sin partículas, destellos ni línea de escaneo. |
+| **pausa** | Cuando una ventana maximizada o a pantalla completa tapa el escritorio | No dibuja nada y lee los datos cada 10 s en vez de cada 2 s. |
+
+La GPU **solo se consulta si ya está despierta**: llamar a `nvidia-smi` con una NVIDIA híbrida dormida la despierta y gasta batería.
+
+## Instalar en GNOME (Ubuntu 22.04 o 24.04, sesión X11)
 
 ```bash
-tar xzf aegis-1.0.tar.gz && cd aegis-1.0
+git clone https://github.com/blackjaguar-ai/aegis && cd aegis
+sudo apt install python3-venv libxcb-cursor0 x11-utils    # solo la primera vez
+./instalar-gnome.sh                # o --acento=1 / 2 / 3
+```
+
+Funciona como capa de escritorio: va detrás de tus ventanas y no aparece en la barra de tareas ni en Alt+Tab. Usa su propio entorno de Python con PySide6, así que no interfiere con conda, y arranca solo al iniciar sesión. Si actualizas Ubuntu y Python cambia de versión, vuelve a ejecutar `./instalar-gnome.sh`: detecta el entorno roto y lo recrea.
+
+- **Super+Alt+A** muestra u oculta el HUD.
+- **Actualizar:** `cd ~/aegis && git pull && ./instalar-gnome.sh`
+- **Quitarlo:** `~/.local/share/aegis/desinstalar-gnome.sh` lo apaga y quita el arranque automático y el atajo. Con `--todo` lo borra por completo.
+- **Modo fijo:** en `~/.config/aegis/gnome.json`, cambia `"modo": "auto"` por `"completo"` o `"eco"`. La pausa por ventana maximizada sigue activa.
+
+## Configuración: `~/.config/aegis/config.json`
+
+Se crea la primera vez con valores por defecto:
+
+```json
+{
+  "clima": {"lat": -12.05, "lon": -77.04, "ciudad": "LIMA"},
+  "accesos": [
+    {"t": "TERMINAL", "s": "shell",  "cmd": "@terminal"},
+    {"t": "VS CODE",  "s": "editor", "cmd": "code"},
+    {"t": "JUPYTER",  "s": "conda",  "cmd": "@term:bash -ic 'jupyter lab'"}
+  ],
+  "proyectos": ["~/proyectos", "~/dev", "~/code", "~"]
+}
+```
+
+- **`clima`:** la ubicación sale de tu zona horaria. Cambia `lat`, `lon` y `ciudad`, o pon `null` para desactivarlo. Es la única llamada de red de AEGIS (Open-Meteo, sin clave, una vez cada 30 minutos).
+- **`accesos`:** hasta 8. `t` es el título y `s` el subtítulo. `cmd` puede ser cualquier orden, `@term:ORDEN` para ejecutarla en una terminal, o `@terminal`, `@monitor`, `@red` o `@archivos`.
+- **`proyectos`:** las carpetas donde se buscan repositorios git.
+
+Los cambios se aplican en unos 20 segundos, sin reiniciar nada.
+
+## Instalar en KDE Plasma 6
+
+```bash
 ./instalar.sh                 # acento cian
 ./instalar.sh --acento=1      # 0 cian, 1 ámbar, 2 carmesí, 3 verde
 ```
 
-Necesita KDE Plasma 6, `python3`, `qdbus6` y `kwriteconfig6`. Solo toca tu usuario y, antes de cambiar nada, guarda una copia de tus ajustes en `~/.local/share/aegis/backup/original/`.
-
-## Instalar en GNOME (Ubuntu 22.04 o más reciente, sesión X11)
-
-Sin Plasma, AEGIS funciona como capa de escritorio con el mismo fondo y el mismo HUD (`gnome/`). Va detrás de tus ventanas y no aparece en la barra de tareas ni en Alt+Tab.
-
-```bash
-git clone https://github.com/blackjaguar-ai/aegis && cd aegis
-./instalar-gnome.sh                # o --acento=1 / 2 / 3
-```
-
-Si te pide dependencias, instálalas con `sudo apt install python3-venv libxcb-cursor0 x11-utils`. Usa su propio entorno de Python con PySide6, así que no interfiere con conda. Arranca solo al iniciar sesión.
-
-**Quitarlo:** `~/.local/share/aegis/desinstalar-gnome.sh` lo apaga y quita el arranque automático. Con `--todo` lo borra por completo.
-
-## Uso (Plasma)
+Necesita `python3`, `qdbus6` y `kwriteconfig6`. Solo toca tu usuario y, antes de cambiar nada, guarda una copia de tus ajustes en `~/.local/share/aegis/backup/original/`. En Plasma, el fondo se pone en modo eco con la batería. Para la pausa por ventana maximizada, desactiva la animación en *Configurar fondo de pantalla*.
 
 ```bash
 ~/.local/share/aegis/aplicar.sh acento 2     # cambia el acento del fondo, el HUD y el bloqueo
 ~/.local/share/aegis/aplicar.sh demo on      # el HUD oculta tu IP y tu red real (para capturas)
-~/.local/share/aegis/aplicar.sh hud          # recoloca el HUD si cambias de resolución
 ~/.local/share/aegis/revertir.sh             # vuelve a tus ajustes anteriores
 ~/.local/share/aegis/desinstalar.sh --todo   # lo borra todo
 ```
 
-El acento y la animación también se cambian desde *Configurar escritorio y fondo de pantalla* y desde la configuración del widget.
+## Privacidad y permisos
+
+El motor (`hud/.../code/datos.py`) **solo lee** `/proc`, `/sys`, `ip`, `ss`, `ps`, `git`, `docker ps` y `powerprofilesctl`, y nunca usa `sudo`. Con `touch ~/.config/aegis/demo`, el HUD oculta tu IP y tu red reales, útil para capturas. Los botones solo ejecutan lo que tú pongas en `config.json`. Docker solo admite nombres de contenedor válidos.
 
 ## Estructura
 
 ```
-fondo-animado/   plugin de fondo (Escena.qml es QtQuick puro: se puede probar sin Plasma)
-hud/             widget HUD (Panel.qml es QtQuick puro; main.qml lo conecta con datos.py)
+fondo-animado/   escena (Escena.qml: QtQuick puro, un único reloj para todas las animaciones) + plugin de Plasma
+hud/             HUD (Panel.qml: QtQuick puro) + datos.py (telemetría) + accion.sh (botones)
+gnome/           capa de escritorio para GNOME: aegis-escritorio.py (energía, atajo) + Escritorio.qml
 tema/            esquema de color, Konsole y Alacritty
-src/panel.js     disposición de la barra superior
 ```
 
 ## Créditos y licencia

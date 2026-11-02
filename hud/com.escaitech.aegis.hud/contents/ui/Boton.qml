@@ -7,6 +7,7 @@ Item {
     id: b
     property string texto: ""
     property string sub: ""
+    property int tam: 14
     property color acento: "#3fe0ff"
     signal pulsado
     Shape {
@@ -20,7 +21,7 @@ Item {
     }
     Column {
         anchors.centerIn: parent
-        Text { anchors.horizontalCenter: parent.horizontalCenter; text: b.texto; font.family: Pal.ui; font.pixelSize: 14; font.weight: Font.Bold; font.letterSpacing: 2; color: Pal.text }
+        Text { anchors.horizontalCenter: parent.horizontalCenter; text: b.texto; font.family: Pal.ui; font.pixelSize: b.tam; font.weight: Font.Bold; font.letterSpacing: b.tam > 11 ? 2 : 1; color: Pal.text }
         Text { anchors.horizontalCenter: parent.horizontalCenter; text: b.sub; font.family: Pal.mono; font.pixelSize: 9; color: Pal.dim; visible: text !== "" }
     }
     MouseArea { id: ma; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: b.pulsado() }
