@@ -262,12 +262,59 @@ def conexiones():
     return dict(n=len(vistos), ext=sum(1 for x in lista if x['x']), l=lista[:24])
 
 
-def procesos():
+def nombre_proc(pid, comm):
+    """Para interpretes (python, node...) muestra el script que ejecutan, no solo 'python'."""
+    if not re.match(r'(python|node|java|ruby|perl|bash|sh)', comm):
+        return comm
+    try:
+        args = open(f'/proc/{pid}/cmdline', 'rb').read().split(b'\0')
+    except Exception:
+        return comm
+    args = [x.decode(errors='replace') for x in args[1:]]
+    for i, a in enumerate(args):
+        if a == '-c':
+            return comm
+        if a == '-m' and i + 1 < len(args):
+            return args[i + 1].split('.')[-1] or comm
+        if a and not a.startswith('-'):
+            base = os.path.basename(a.rstrip('/'))
+            return re.sub(r'\.(py|js|sh|jar)$', '', base) or comm
+    return comm
+
+
+def procesos(e):
+    """Uso de CPU de los ultimos ~2 s (como top), no el promedio desde que arranco el proceso (como ps)."""
+    total = sum(int(x) for x in open('/proc/stat').readline().split()[1:9])
+    ncpu = os.cpu_count() or 1
+    act, yo = {}, os.getpid()
+    for d in os.listdir('/proc'):
+        if not d.isdigit() or int(d) == yo:
+            continue
+        try:
+            st = open(f'/proc/{d}/stat').read()
+            comm = st[st.index('(') + 1:st.rindex(')')]
+            campos = st[st.rindex(')') + 2:].split()
+            act[d] = (int(campos[11]) + int(campos[12]), comm)   # utime + stime
+        except Exception:
+            continue
+    ant, e['procs'] = e.get('procs'), {'t': total, 'p': {k: v[0] for k, v in act.items()}}
+    if not ant or total <= ant['t']:
+        return []
+    dt = (total - ant['t']) / ncpu
+    filas = []
+    for pid, (ticks, comm) in act.items():
+        d = ticks - ant['p'].get(pid, ticks)
+        if d > 0:
+            filas.append((100.0 * d / dt, pid, comm))
+    filas.sort(reverse=True)
+    mem_total = max(1, int(re.search(r'MemTotal:\s+(\d+)', open('/proc/meminfo').read()).group(1)))
     top = []
-    for l in sh(['ps', '-eo', 'comm,%cpu,%mem', '--sort=-%cpu', '--no-headers']).splitlines()[:8]:
-        p = l.split()
-        if len(p) >= 3 and p[0] not in ('ps', 'python3') and len(top) < 4:
-            top.append(dict(n=' '.join(p[:-2])[:18], c=float(p[-2]), m=float(p[-1])))
+    for c, pid, comm in filas[:4]:
+        try:
+            rss = int(re.search(r'VmRSS:\s+(\d+)', open(f'/proc/{pid}/status').read()).group(1))
+        except Exception:
+            rss = 0
+        top.append(dict(n=nombre_proc(pid, comm)[:18], c=round(c, 1), m=round(100.0 * rss / mem_total, 1)))
     return top
 
 
@@ -332,7 +379,7 @@ def rapido():
              ac=corriente_ac(), bat=bateria(), net=red(e), conex=conexiones(),
              load=[float(x) for x in leer('/proc/loadavg', '0 0 0').split()[:3]],
              up=int(float(leer('/proc/uptime', '0').split()[0])),
-             disco=round(100.0 * du.used / du.total, 1), libre=round(du.free / 2 ** 30), top=procesos(), nuc=os.cpu_count())
+             disco=round(100.0 * du.used / du.total, 1), libre=round(du.free / 2 ** 30), top=procesos(e), nuc=os.cpu_count())
     d['eventos'] = eventos_rapido(e, d)
     jguarda(ESTADO, e)
     return d
