@@ -6,7 +6,7 @@ import "geo.js" as G
 // Se dibuja en un lienzo virtual de 1920x1080 y se escala para cubrir cualquier pantalla.
 //
 // Energia: todo el movimiento sale de un unico reloj ('fase'):
-//   modo "completo"  avanza en cada cuadro (FrameAnimation): animacion fluida con particulas y destellos
+//   modo "completo"  avanza 30 veces por segundo: animacion fluida con particulas y destellos
 //   modo "eco"       avanza 12 veces por segundo y apaga particulas, destellos y linea de escaneo
 //   modo "pausa"     no avanza: la escena queda quieta y la GPU no redibuja nada
 // Datos: quien la use le pasa carga, nucleos, conexiones y etiquetas, y llama a agregar() con eventos reales.
@@ -37,11 +37,11 @@ Item {
 
     // ---------------------------------------------------------- reloj comun
     property real fase: 0
-    property real cargaS: carga
-    Behavior on cargaS { enabled: esc.fluido; NumberAnimation { duration: 1500; easing.type: Easing.InOutQuad } }
+    property real cargaS: carga        // se suaviza dentro del propio reloj (sin animaciones extra a 144 Hz)
     readonly property real vel: 0.7 + 1.8 * Math.max(0, Math.min(1, cargaS))   // el nucleo se acelera con la CPU
-    FrameAnimation { running: esc.modo === "completo"; onTriggered: esc.fase += Math.min(frameTime, 0.1) * esc.vel }
-    Timer { interval: 83; repeat: true; running: esc.modo === "eco"; onTriggered: esc.fase += 0.083 * esc.vel }
+    // completo = 30 fps fijos: con FrameAnimation iba a la frecuencia de la pantalla (144 Hz = 144 redibujos/s)
+    Timer { interval: 33; repeat: true; running: esc.modo === "completo"; onTriggered: { esc.fase += 0.033 * esc.vel; esc.cargaS += (esc.carga - esc.cargaS) * 0.05 } }
+    Timer { interval: 83; repeat: true; running: esc.modo === "eco"; onTriggered: { esc.fase += 0.083 * esc.vel; esc.cargaS += (esc.carga - esc.cargaS) * 0.12 } }
     Timer { interval: 1000; repeat: true; running: esc.vivo; triggeredOnStart: true; onTriggered: esc.ahora = new Date() }
 
     function p2(n) { return (n < 10 ? "0" : "") + n }
@@ -131,7 +131,7 @@ Item {
 
         // ---------------------------------------------------------- particulas ascendentes (solo modo completo)
         Repeater {
-            model: 40
+            model: 24
             Rectangle {
                 id: pa
                 required property int index
@@ -337,7 +337,6 @@ Item {
                             height: parent.height
                             width: Math.max(2, 150 * Math.min(1, bf.v))
                             color: G.alfa(bf.v > 0.8 ? esc.acento2 : esc.acento, 0.3 + 0.6 * bf.v)
-                            Behavior on width { enabled: esc.fluido; NumberAnimation { duration: 800; easing.type: Easing.OutCubic } }
                         }
                     }
                 }

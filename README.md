@@ -36,7 +36,7 @@
 
 | Modo | Cuándo | Qué hace |
 |---|---|---|
-| **completo** | Con el cargador conectado y el escritorio visible | Animación fluida con partículas y destellos. |
+| **completo** | Con el cargador conectado y el escritorio visible | 30 cuadros por segundo (aunque tu pantalla sea de 144 Hz), con partículas y destellos. |
 | **eco** | Con batería | Dibuja 12 cuadros por segundo, sin partículas, destellos ni línea de escaneo. |
 | **pausa** | Cuando una ventana maximizada o a pantalla completa tapa el escritorio | No dibuja nada y lee los datos cada 10 s en vez de cada 2 s. |
 

@@ -60,7 +60,7 @@ Item {
         d: r.d; s: r.s; cpuH: r.cpuH; rxH: r.rxH; txH: r.txH; ahora: r.ahora
         acento: r.p.a; acento2: r.p.b
         vivo: motor.modo !== "pausa"
-        fluido: motor.modo === "completo"
+        fluido: false   // medidores sin transicion: cada animacion iria a la frecuencia de la pantalla
         onAccion: function (id, arg) { motor.accion(id, arg) }
     }
 }
